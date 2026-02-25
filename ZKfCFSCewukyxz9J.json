@@ -1,0 +1,49 @@
+{
+  "updatedAt": "2026-02-25T10:50:34.299Z",
+  "createdAt": "2026-02-25T10:50:03.724Z",
+  "id": "ZKfCFSCewukyxz9J",
+  "name": "My workflow 2",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "78483a6b-5bf9-4e3c-a5b2-8a10b5daf498",
+  "activeVersionId": null,
+  "versionCounter": 4,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-02-25T10:50:03.726Z",
+      "createdAt": "2026-02-25T10:50:03.726Z",
+      "role": "workflow:owner",
+      "workflowId": "ZKfCFSCewukyxz9J",
+      "projectId": "OelGsS4pXad1phYd",
+      "project": {
+        "updatedAt": "2026-02-25T10:27:37.193Z",
+        "createdAt": "2026-02-25T10:00:42.221Z",
+        "id": "OelGsS4pXad1phYd",
+        "name": "Yifun Wu <a369713387@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "fdc3b456-2219-4791-9454-ddd7d4f79900"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": null,
+    "description": null
+  }
+}
