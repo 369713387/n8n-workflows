@@ -1,12 +1,14 @@
 {
+  "id": "DiscordTextImg01",
   "name": "Discord长文转图片",
+  "active": false,
   "nodes": [
     {
       "parameters": {
         "events": ["messageCreated"],
         "additionalFields": {}
       },
-      "id": "a1b2c3d4-0001-4000-8000-000000000001",
+      "id": "node-trigger-001",
       "name": "Discord Trigger",
       "type": "n8n-nodes-base.discordTrigger",
       "typeVersion": 1,
@@ -14,7 +16,6 @@
       "webhookId": "auto",
       "credentials": {
         "discordApi": {
-          "id": "discord-bot-credentials",
           "name": "Discord Bot"
         }
       }
@@ -29,7 +30,7 @@
           },
           "conditions": [
             {
-              "id": "length-check",
+              "id": "cond-length",
               "leftValue": "={{ $json.content }}",
               "rightValue": "",
               "operator": {
@@ -42,7 +43,7 @@
           "combinator": "and"
         }
       },
-      "id": "a1b2c3d4-0002-4000-8000-000000000002",
+      "id": "node-check-001",
       "name": "检查文字长度",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
@@ -50,9 +51,9 @@
     },
     {
       "parameters": {
-        "jsCode": "// 生成HTML内容\nconst input = $input.all()[0].json;\nconst text = input.content || '';\nconst author = input.author?.username || 'User';\nconst guildName = input.guild?.name || 'Discord';\n\n// 处理文本 - 转义HTML并格式化\nconst escapeHtml = (str) => {\n  return str\n    .replace(/&/g, '&amp;')\n    .replace(/</g, '&lt;')\n    .replace(/>/g, '&gt;')\n    .replace(/\"/g, '&quot;');\n};\n\nlet formattedText = escapeHtml(text);\n\n// Markdown样式转换\nformattedText = formattedText\n  .replace(/```([\\s\\S]*?)```/g, '<pre class=\"code-block\">$1</pre>')\n  .replace(/`([^`]+)`/g, '<code class=\"inline-code\">$1</code>')\n  .replace(/\\*\\*([^*]+)\\*\\*/g, '<strong>$1</strong>')\n  .replace(/\\*([^*]+)\\*/g, '<em>$1</em>')\n  .replace(/__([^_]+)__/g, '<u>$1</u>')\n  .replace(/~~([^~]+)~~/g, '<del>$1</del>')\n  .replace(/\\n/g, '<br>');\n\nconst timestamp = new Date().toLocaleString('zh-CN', {\n  timeZone: 'Asia/Shanghai',\n  year: 'numeric',\n  month: '2-digit',\n  day: '2-digit',\n  hour: '2-digit',\n  minute: '2-digit'\n});\n\nconst html = `<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <style>\n    * { margin: 0; padding: 0; box-sizing: border-box; }\n    body {\n      font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;\n      background: #36393f;\n      padding: 20px;\n      min-height: 100vh;\n    }\n    .message-container {\n      background: #36393f;\n      border-radius: 8px;\n      padding: 16px 20px;\n      max-width: 800px;\n    }\n    .header {\n      display: flex;\n      align-items: center;\n      margin-bottom: 8px;\n    }\n    .avatar {\n      width: 40px;\n      height: 40px;\n      border-radius: 50%;\n      background: linear-gradient(135deg, #5865F2, #7289DA);\n      display: flex;\n      align-items: center;\n      justify-content: center;\n      color: white;\n      font-weight: bold;\n      font-size: 18px;\n      margin-right: 16px;\n      flex-shrink: 0;\n    }\n    .author-name {\n      font-weight: 600;\n      font-size: 16px;\n      color: #ffffff;\n      margin-right: 8px;\n    }\n    .timestamp {\n      font-size: 12px;\n      color: #72767d;\n    }\n    .content {\n      font-size: 16px;\n      line-height: 1.6;\n      color: #dcddde;\n      margin-left: 56px;\n      word-wrap: break-word;\n      white-space: pre-wrap;\n    }\n    .code-block {\n      background: #2f3136;\n      color: #b9bbbe;\n      padding: 12px 16px;\n      border-radius: 4px;\n      font-family: 'Fira Code', 'Consolas', monospace;\n      font-size: 14px;\n      overflow-x: auto;\n      margin: 8px 0;\n      border-left: 3px solid #5865F2;\n    }\n    .inline-code {\n      background: #2f3136;\n      padding: 2px 6px;\n      border-radius: 3px;\n      font-family: 'Fira Code', monospace;\n      font-size: 14px;\n      color: #e8919d;\n    }\n    strong { color: #ffffff; font-weight: 600; }\n    em { color: #b9bbbe; font-style: italic; }\n    u { text-decoration: underline; color: #00aff4; }\n    del { text-decoration: line-through; color: #72767d; }\n    .footer {\n      margin-top: 16px;\n      padding-top: 12px;\n      border-top: 1px solid #42454a;\n      text-align: center;\n      font-size: 11px;\n      color: #72767d;\n      margin-left: 56px;\n    }\n  </style>\n</head>\n<body>\n  <div class=\"message-container\">\n    <div class=\"header\">\n      <div class=\"avatar\">${author.charAt(0).toUpperCase()}</div>\n      <span class=\"author-name\">${escapeHtml(author)}</span>\n      <span class=\"timestamp\">${timestamp}</span>\n    </div>\n    <div class=\"content\">${formattedText}</div>\n    <div class=\"footer\">via Discord Bot • ${escapeHtml(guildName)}</div>\n  </div>\n</body>\n</html>`;\n\nreturn {\n  json: {\n    html: html,\n    channelId: input.channelId,\n    originalMessage: text,\n    author: author\n  }\n};"
+        "jsCode": "const input = $input.all()[0].json;\nconst text = input.content || '';\nconst author = input.author?.username || 'User';\nconst guildName = input.guild?.name || 'Discord';\n\nconst escapeHtml = (str) => str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;');\n\nlet formattedText = escapeHtml(text);\nformattedText = formattedText\n  .replace(/```([\\s\\S]*?)```/g, '<pre class=\"code-block\">$1</pre>')\n  .replace(/`([^`]+)`/g, '<code class=\"inline-code\">$1</code>')\n  .replace(/\\*\\*([^*]+)\\*\\*/g, '<strong>$1</strong>')\n  .replace(/\\*([^*]+)\\*/g, '<em>$1</em>')\n  .replace(/__([^_]+)__/g, '<u>$1</u>')\n  .replace(/~~([^~]+)~~/g, '<del>$1</del>')\n  .replace(/\\n/g, '<br>');\n\nconst timestamp = new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });\n\nconst html = `<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><style>\n* { margin: 0; padding: 0; box-sizing: border-box; }\nbody { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #36393f; padding: 20px; }\n.message-container { background: #36393f; border-radius: 8px; padding: 16px 20px; max-width: 800px; }\n.header { display: flex; align-items: center; margin-bottom: 8px; }\n.avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #5865F2, #7289DA); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 18px; margin-right: 16px; }\n.author-name { font-weight: 600; font-size: 16px; color: #ffffff; margin-right: 8px; }\n.timestamp { font-size: 12px; color: #72767d; }\n.content { font-size: 16px; line-height: 1.6; color: #dcddde; margin-left: 56px; word-wrap: break-word; }\n.code-block { background: #2f3136; color: #b9bbbe; padding: 12px 16px; border-radius: 4px; font-family: monospace; font-size: 14px; margin: 8px 0; border-left: 3px solid #5865F2; }\n.inline-code { background: #2f3136; padding: 2px 6px; border-radius: 3px; font-family: monospace; font-size: 14px; color: #e8919d; }\nstrong { color: #ffffff; font-weight: 600; }\nem { color: #b9bbbe; font-style: italic; }\n.footer { margin-top: 16px; padding-top: 12px; border-top: 1px solid #42454a; text-align: center; font-size: 11px; color: #72767d; margin-left: 56px; }\n</style></head><body><div class=\"message-container\"><div class=\"header\"><div class=\"avatar\">${author.charAt(0).toUpperCase()}</div><span class=\"author-name\">${escapeHtml(author)}</span><span class=\"timestamp\">${timestamp}</span></div><div class=\"content\">${formattedText}</div><div class=\"footer\">via Discord Bot</div></div></body></html>`;\n\nreturn { json: { html, channelId: input.channelId, originalMessage: text, author } };"
       },
-      "id": "a1b2c3d4-0003-4000-8000-000000000003",
+      "id": "node-html-001",
       "name": "生成HTML",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -65,41 +66,19 @@
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
-            {
-              "name": "access_key",
-              "value": "={{ $credentials.apiflashKey }}"
-            },
-            {
-              "name": "html",
-              "value": "={{ encodeURIComponent($json.html) }}"
-            },
-            {
-              "name": "format",
-              "value": "png"
-            },
-            {
-              "name": "width",
-              "value": "850"
-            },
-            {
-              "name": "full_page",
-              "value": "true"
-            },
-            {
-              "name": "scale",
-              "value": "2"
-            }
+            { "name": "access_key", "value": "={{ $credentials.apiflashKey }}" },
+            { "name": "html", "value": "={{ encodeURIComponent($json.html) }}" },
+            { "name": "format", "value": "png" },
+            { "name": "width", "value": "850" },
+            { "name": "full_page", "value": "true" },
+            { "name": "scale", "value": "2" }
           ]
         },
         "options": {
-          "response": {
-            "response": {
-              "responseFormat": "file"
-            }
-          }
+          "response": { "response": { "responseFormat": "file" } }
         }
       },
-      "id": "a1b2c3d4-0004-4000-8000-000000000004",
+      "id": "node-screenshot-001",
       "name": "截图API",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
@@ -109,40 +88,23 @@
       "parameters": {
         "operation": "send",
         "channelId": "={{ $('Discord Trigger').item.json.channelId }}",
-        "content": "=📸 文字已转换为图片",
+        "content": "📸 文字已转换为图片",
         "attachments": {
-          "attachments": [
-            {
-              "name": "text-image.png",
-              "binaryPropertyName": "data"
-            }
-          ]
+          "attachments": [{ "name": "text-image.png", "binaryPropertyName": "data" }]
         }
       },
-      "id": "a1b2c3d4-0005-4000-8000-000000000005",
+      "id": "node-send-img-001",
       "name": "发送图片",
       "type": "n8n-nodes-base.discord",
       "typeVersion": 2,
       "position": [1120, 200],
-      "credentials": {
-        "discordApi": {
-          "id": "discord-bot-credentials",
-          "name": "Discord Bot"
-        }
-      }
+      "credentials": { "discordApi": { "name": "Discord Bot" } }
     },
     {
       "parameters": {
-        "values": {
-          "string": [
-            {
-              "name": "reply",
-              "value": "文字长度不足500字符，无需转换成图片～"
-            }
-          ]
-        }
+        "values": { "string": [{ "name": "reply", "value": "文字长度不足500字符，无需转换成图片~" }] }
       },
-      "id": "a1b2c3d4-0006-4000-8000-000000000006",
+      "id": "node-skip-001",
       "name": "跳过提示",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
@@ -154,106 +116,26 @@
         "channelId": "={{ $('Discord Trigger').item.json.channelId }}",
         "content": "={{ $json.reply }}"
       },
-      "id": "a1b2c3d4-0007-4000-8000-000000000007",
+      "id": "node-send-skip-001",
       "name": "发送跳过提示",
       "type": "n8n-nodes-base.discord",
       "typeVersion": 2,
       "position": [900, 420],
-      "credentials": {
-        "discordApi": {
-          "id": "discord-bot-credentials",
-          "name": "Discord Bot"
-        }
-      }
+      "credentials": { "discordApi": { "name": "Discord Bot" } }
     }
   ],
   "connections": {
-    "Discord Trigger": {
-      "main": [
-        [
-          {
-            "node": "检查文字长度",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "检查文字长度": {
-      "main": [
-        [
-          {
-            "node": "生成HTML",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "跳过提示",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "生成HTML": {
-      "main": [
-        [
-          {
-            "node": "截图API",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "截图API": {
-      "main": [
-        [
-          {
-            "node": "发送图片",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "跳过提示": {
-      "main": [
-        [
-          {
-            "node": "发送跳过提示",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    }
+    "Discord Trigger": { "main": [[{ "node": "检查文字长度", "type": "main", "index": 0 }]] },
+    "检查文字长度": { "main": [[{ "node": "生成HTML", "type": "main", "index": 0 }], [{ "node": "跳过提示", "type": "main", "index": 0 }]] },
+    "生成HTML": { "main": [[{ "node": "截图API", "type": "main", "index": 0 }]] },
+    "截图API": { "main": [[{ "node": "发送图片", "type": "main", "index": 0 }]] },
+    "跳过提示": { "main": [[{ "node": "发送跳过提示", "type": "main", "index": 0 }]] }
   },
-  "settings": {
-    "executionOrder": "v1"
-  },
+  "settings": { "executionOrder": "v1" },
   "staticData": null,
-  "tags": [
-    {
-      "name": "Discord",
-      "createdAt": "2026-02-26T00:00:00.000Z",
-      "updatedAt": "2026-02-26T00:00:00.000Z"
-    },
-    {
-      "name": "自动化",
-      "createdAt": "2026-02-26T00:00:00.000Z",
-      "updatedAt": "2026-02-26T00:00:00.000Z"
-    }
-  ],
+  "tags": [],
   "pinData": {},
-  "meta": {
-    "templateCredsSetupCompleted": false,
-    "instanceId": "auto-sync"
-  },
+  "versionId": "1.0.0",
   "triggerCount": 1,
-  "createdAt": "2026-02-26T00:00:00.000Z",
-  "updatedAt": "2026-02-26T00:00:00.000Z",
-  "versionId": "1.0.0"
+  "meta": { "templateCredsSetupCompleted": false }
 }
